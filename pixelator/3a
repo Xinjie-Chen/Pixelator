@@ -1,0 +1,24 @@
+#include "StbImageDataView.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
+namespace {
+constexpr int kLoadAllChannels{0};
+}
+
+namespace pixelator {
+StbImageDataView::StbImageDataView(const std::filesystem::path& image_path)
+    : image_path_{image_path}, is_empty_{false} {
+  data_ = stbi_load(
+      image_path_.c_str(), &cols_, &rows_, &channels_, kLoadAllChannels);
+}
+StbImageDataView::StbImageDataView(StbImageDataView&& object) {
+  cols_ = object.cols_;
+  rows_ = object.rows_;
+  channels_ = object.channels_;
+  is_empty_ = object.is_empty_;
+  data_ = std::move(object.data_);
+}
+StbImageDataView::~StbImageDataView() { stbi_image_free(data_); }
+
+}  // namespace pixelator
